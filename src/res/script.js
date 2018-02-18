@@ -7,6 +7,7 @@ var Font = java.awt.Font;
 
 var KeyAdapter = java.awt.event.KeyAdapter;
 var KeyEvent = java.awt.event.KeyEvent;
+var WindowAdapter = java.awt.event.WindowAdapter;
 
 var BufferedImage = java.awt.image.BufferedImage;
 
@@ -27,9 +28,9 @@ var JFrame = javax.swing.JFrame;
 var JPanel = javax.swing.JPanel;
 
 // implemented on use
-var MyPanel = Java.extend(JPanel, Runnable);
-
 var MyKeyListener = Java.extend(KeyAdapter);
+var MyPanel = Java.extend(JPanel, Runnable);
+var MyWindowListener = Java.extend(WindowAdapter);
 
 // class definitions end here
 
@@ -94,6 +95,15 @@ if (!highscore_file.exists()) {
 	reader.close();
 }
 
+function checkHighscore() {
+	if (old_highscore == highscore)
+		return;
+	var writer = new FileWriter(highscore_file);
+	writer.write(Integer.toString(highscore));
+	writer.close();
+	old_highscore = highscore;
+}
+
 function init() {
 	y = 0.5;
 	
@@ -118,11 +128,8 @@ init();
 
 // delta - elapsed milliseconds since last update call
 function update(delta) {
-	if (gameover && old_highscore != highscore) {
-		var writer = new FileWriter(highscore_file);
-		writer.write(Integer.toString(highscore));
-		writer.close();
-		old_highscore = highscore;
+	if (gameover) {
+		checkHighscore();
 	}
 	
 	y += speed.y;
@@ -247,21 +254,34 @@ frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 frame.setTitle("Hello World!");
 
 // class is implemented here bcs i did it with the panel class, too
-var listener = new MyKeyListener({
+var keyListener = new MyKeyListener({
 	keyPressed: function(e) {
 		if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+			checkHighscore();
 			System.exit(0);
 		} else if (e.getKeyCode() == KeyEvent.VK_SPACE) {
 			if (!gameover) {
 				speed.y = -1 / 1000;
 			}
 		} else if (e.getKeyCode() == KeyEvent.VK_R) {
+			checkHighscore();
 			init();
 		}
 	}
 });
 
-frame.addKeyListener(listener);
+frame.addKeyListener(keyListener);
+
+var windowListener = new MyWindowListener({
+	windowClosed: function(e) {
+		checkHighscore();
+	},
+	windowClosing: function(e) {
+		checkHighscore();
+	}
+});
+
+frame.addWindowListener(windowListener);
 
 // class is implemented here bcs idk how else to do Java.super()
 var panel = new MyPanel({
