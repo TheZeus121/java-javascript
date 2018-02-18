@@ -68,7 +68,7 @@ var holes = [];
 
 var speed;
 
-var gravity = 1 / 500000;
+var gravity = 1 / 2000000;
 
 // BufferedImage for double buffered rendering
 var buf = null;
@@ -132,7 +132,7 @@ function update(delta) {
 		checkHighscore();
 	}
 	
-	y += speed.y;
+	y += speed.y * delta;
 	if (y < 0) {
 		y = 0;
 	}
@@ -251,7 +251,7 @@ function draw(g, width, height) {
 // make the frame
 var frame = new JFrame();
 frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-frame.setTitle("Hello World!");
+frame.setTitle("Flip-Floppy Bird");
 
 // class is implemented here bcs i did it with the panel class, too
 var keyListener = new MyKeyListener({
@@ -261,7 +261,7 @@ var keyListener = new MyKeyListener({
 			System.exit(0);
 		} else if (e.getKeyCode() == KeyEvent.VK_SPACE) {
 			if (!gameover) {
-				speed.y = -1 / 1000;
+				speed.y = -1 / 3000;
 			}
 		} else if (e.getKeyCode() == KeyEvent.VK_R) {
 			checkHighscore();
